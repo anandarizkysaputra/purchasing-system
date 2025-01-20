@@ -17,8 +17,16 @@ def load_data():
 def save_data(data):
     data.to_csv(DATA_FILE, index=False)
 
+# Fungsi untuk membuat ID barang
+def generate_item_id(item_name, data):
+    # Ambil huruf pertama dari setiap kata pada nama barang
+    initials = ''.join(word[0].upper() for word in item_name.split())
+    # Hitung jumlah barang dengan inisial yang sama untuk menentukan nomor urut
+    count = sum(data['ID'].str.startswith(initials)) if not data.empty else 0
+    return f"{initials}-{count + 1:03d}"
+
 # Aplikasi Streamlit
-st.title("Sistem Purchasing Barang")
+st.title("Sistem Purchasing Barang dengan ID Unik")
 
 # Load data
 data = load_data()
@@ -31,15 +39,15 @@ with st.form("purchase_form"):
     submitted = st.form_submit_button("Tambah")
 
     if submitted:
-        # Hitung ID baru berdasarkan jumlah baris yang ada
-        new_id = len(data) + 1 if not data.empty else 1
-        total = quantity * price
-        new_row = {'ID': new_id, 'Item': item, 'Quantity': quantity, 'Price': price, 'Total': total}
-        
-        # Tambahkan data baru menggunakan pd.concat
-        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
-        save_data(data)
-        st.success(f"Barang dengan ID {new_id} berhasil ditambahkan!")
+        if not item.strip():
+            st.error("Nama barang tidak boleh kosong!")
+        else:
+            total = quantity * price
+            item_id = generate_item_id(item, data)  # Buat ID barang
+            new_row = {'ID': item_id, 'Item': item, 'Quantity': quantity, 'Price': price, 'Total': total}
+            data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)  # Tambahkan data baru
+            save_data(data)
+            st.success(f"Barang dengan ID {item_id} berhasil ditambahkan!")
 
 # Tampilkan data
 st.subheader("Data Purchasing")
