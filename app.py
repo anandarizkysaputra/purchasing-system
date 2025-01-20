@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -6,7 +5,7 @@ import pandas as pd
 DATA_FILE = 'data.csv'
 
 # Fungsi untuk memuat data
-@st.cache
+@st.cache_data
 def load_data():
     try:
         data = pd.read_csv(DATA_FILE)
@@ -27,14 +26,14 @@ data = load_data()
 # Form input
 with st.form("purchase_form"):
     item = st.text_input("Nama Barang")
-    quantity = st.number_input("Jumlah", min_value=1)
-    price = st.number_input("Harga per Barang", min_value=0.0)
+    quantity = st.number_input("Jumlah", min_value=1, step=1)
+    price = st.number_input("Harga per Barang", min_value=0.0, step=0.01)
     submitted = st.form_submit_button("Tambah")
 
     if submitted:
         total = quantity * price
         new_row = {'Item': item, 'Quantity': quantity, 'Price': price, 'Total': total}
-        data = data.append(new_row, ignore_index=True)
+        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)  # Update penggunaan concat
         save_data(data)
         st.success("Barang berhasil ditambahkan!")
 
