@@ -15,13 +15,14 @@ def load_data():
 
 # Fungsi untuk menyimpan data
 def save_data(data):
+    # Urutkan kolom sebelum menyimpan
+    column_order = ['ID', 'Item', 'Quantity', 'Price', 'Total']
+    data = data[column_order]
     data.to_csv(DATA_FILE, index=False)
 
 # Fungsi untuk membuat ID barang
 def generate_item_id(item_name, data):
-    # Ambil huruf pertama dari setiap kata pada nama barang
     initials = ''.join(word[0].upper() for word in item_name.split())
-    # Hitung jumlah barang dengan inisial yang sama untuk menentukan nomor urut
     count = sum(data['ID'].str.startswith(initials)) if not data.empty else 0
     return f"{initials}-{count + 1:03d}"
 
@@ -48,6 +49,10 @@ with st.form("purchase_form"):
             data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)  # Tambahkan data baru
             save_data(data)
             st.success(f"Barang dengan ID {item_id} berhasil ditambahkan!")
+
+# Pastikan kolom diurutkan
+column_order = ['ID', 'Item', 'Quantity', 'Price', 'Total']
+data = data[column_order]
 
 # Tampilkan data
 st.subheader("Data Purchasing")
