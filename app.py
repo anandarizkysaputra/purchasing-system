@@ -9,13 +9,17 @@ DATA_FILE = 'data.csv'
 def load_data():
     try:
         data = pd.read_csv(DATA_FILE)
+        # Validasi kolom
+        expected_columns = ['ID', 'Item', 'Quantity', 'Price', 'Total']
+        for col in expected_columns:
+            if col not in data.columns:
+                data[col] = "" if col in ['ID', 'Item'] else 0
     except FileNotFoundError:
         data = pd.DataFrame(columns=['ID', 'Item', 'Quantity', 'Price', 'Total'])
     return data
 
 # Fungsi untuk menyimpan data
 def save_data(data):
-    # Urutkan kolom sebelum menyimpan
     column_order = ['ID', 'Item', 'Quantity', 'Price', 'Total']
     data = data[column_order]
     data.to_csv(DATA_FILE, index=False)
@@ -46,11 +50,17 @@ with st.form("purchase_form"):
             total = quantity * price
             item_id = generate_item_id(item, data)  # Buat ID barang
             new_row = {'ID': item_id, 'Item': item, 'Quantity': quantity, 'Price': price, 'Total': total}
-            data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)  # Tambahkan data baru
+            data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
             save_data(data)
             st.success(f"Barang dengan ID {item_id} berhasil ditambahkan!")
 
-# Pastikan kolom diurutkan
+# Validasi kolom sebelum menampilkan
+expected_columns = ['ID', 'Item', 'Quantity', 'Price', 'Total']
+for col in expected_columns:
+    if col not in data.columns:
+        data[col] = "" if col in ['ID', 'Item'] else 0
+
+# Reorder kolom
 column_order = ['ID', 'Item', 'Quantity', 'Price', 'Total']
 data = data[column_order]
 
