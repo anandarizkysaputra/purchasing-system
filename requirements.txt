@@ -1,7 +1,2 @@
 streamlit
 pandas
-sqlite3
-matplotlib
-plotly
-
-pip install -r requirements.txt
