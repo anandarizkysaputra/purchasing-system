@@ -10,7 +10,7 @@ def load_data():
     try:
         data = pd.read_csv(DATA_FILE)
     except FileNotFoundError:
-        data = pd.DataFrame(columns=['Item', 'Quantity', 'Price', 'Total'])
+        data = pd.DataFrame(columns=['ID', 'Item', 'Quantity', 'Price', 'Total'])
     return data
 
 # Fungsi untuk menyimpan data
@@ -31,11 +31,15 @@ with st.form("purchase_form"):
     submitted = st.form_submit_button("Tambah")
 
     if submitted:
+        # Hitung ID baru berdasarkan jumlah baris yang ada
+        new_id = len(data) + 1 if not data.empty else 1
         total = quantity * price
-        new_row = {'Item': item, 'Quantity': quantity, 'Price': price, 'Total': total}
-        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)  # Update penggunaan concat
+        new_row = {'ID': new_id, 'Item': item, 'Quantity': quantity, 'Price': price, 'Total': total}
+        
+        # Tambahkan data baru menggunakan pd.concat
+        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
         save_data(data)
-        st.success("Barang berhasil ditambahkan!")
+        st.success(f"Barang dengan ID {new_id} berhasil ditambahkan!")
 
 # Tampilkan data
 st.subheader("Data Purchasing")
